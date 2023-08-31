@@ -6,5 +6,5 @@ Setup Instructions
 2. cd ios and pod install
 
 Run android and ios Respectively by running following command
-npx expo run:android
-npx expo run:ios
+-- npx expo run:android
+-- npx expo run:ios
