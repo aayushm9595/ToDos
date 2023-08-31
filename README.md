@@ -5,6 +5,6 @@ Setup Instructions
 1. npm i
 2. cd ios and pod install
 
-Run android and ios Respectively by running following command
--- npx expo run:android
--- npx expo run:ios
+Run android and ios Respectively by running following command <br />
+npx expo run:android <br />
+npx expo run:ios
