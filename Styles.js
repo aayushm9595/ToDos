@@ -7,6 +7,7 @@ export const Styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  textCenterAlign: { textAlign: "center" },
   loginText: {
     color: "#fff",
     textAlign: "center",

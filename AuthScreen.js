@@ -94,8 +94,7 @@ export const AuthScreen = ({ navigation, route }) => {
       {(authenticationError === "passcode_not_set" ||
         authenticationError === "not_enrolled") && (
         <>
-          <Text style={{ textAlign: "center" }}>
-            {" "}
+          <Text style={styles.textCenterAlign}>
             To use the app you must set a screen lock
           </Text>
           <TouchableOpacity
@@ -112,7 +111,7 @@ export const AuthScreen = ({ navigation, route }) => {
       )}
       {authenticationError === "user_cancel" && (
         <>
-          <Text style={{ textAlign: "center" }}>Authenticate to proceed</Text>
+          <Text style={styles.textCenterAlign}>Authenticate to proceed</Text>
           <TouchableOpacity
             style={styles.loginScreenButton}
             underlayColor="white"
