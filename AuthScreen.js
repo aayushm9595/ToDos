@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Platform,
-  Linking,
   View,
   TouchableOpacity,
   AppState,
