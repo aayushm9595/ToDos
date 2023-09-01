@@ -7,9 +7,12 @@ import {
   AppState,
   Text,
 } from "react-native";
-import * as LocalAuthentication from "expo-local-authentication";
-import * as SecureStore from "expo-secure-store";
 import { Styles as styles } from "./Styles";
+import {
+  checkAuthentication,
+  promptForAuthentication,
+  goToSettings,
+} from "./utility/auth";
 export const AuthScreen = ({ navigation, route }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authenticationError, setAuthenticationError] = useState("");
@@ -18,54 +21,24 @@ export const AuthScreen = ({ navigation, route }) => {
     navigation.navigate("ToDo");
   };
 
-  const promptForAuthentication = async () => {
-    try {
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Authenticate with biometric",
-        fallbackLabel: "Enter custom passcode",
-      });
-      setIsAuthenticated(result.success);
-      setAuthenticationError(result.error);
-    } catch (error) {
-      console.error("Error during authentication:", error);
-    }
-    await SecureStore.setItemAsync(
-      "lastActiveTime",
-      new Date().getTime().toString()
-    );
-  };
-
-  const checkAuthentication = async () => {
-    // Check if the app was in the background for more than 5 seconds
-    const backgroundTime = 5 * 1000; // 5 seconds
-    const currentTime = new Date().getTime();
-    const lastActiveTime = await SecureStore.getItemAsync("lastActiveTime");
-    if (
-      !lastActiveTime ||
-      currentTime - parseInt(lastActiveTime, 10) > backgroundTime
-    ) {
-      promptForAuthentication();
-    }
-    // Update the last active time
-    await SecureStore.setItemAsync(
-      "lastActiveTime",
-      new Date().getTime().toString()
-    );
+  const setAuthenticationResults = (result) => {
+    setIsAuthenticated(result.success);
+    setAuthenticationError(result.error);
   };
 
   useEffect(() => {
     // Check authentication when the app is focused
-    promptForAuthentication();
+    promptForAuthentication(setAuthenticationResults);
     const appStateChangeHandler = async (nextAppState) => {
       if (nextAppState === "active") {
-        checkAuthentication();
+        checkAuthentication(setAuthenticationResults);
       }
     };
 
     AppState.addEventListener("change", appStateChangeHandler);
 
     // Check authentication on initial app load
-    checkAuthentication();
+    checkAuthentication(setAuthenticationResults);
 
     // Cleanup the event listener
     return () => {
@@ -74,19 +47,13 @@ export const AuthScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigation.navigate("ToDo");
-    } else {
+    if (!isAuthenticated) {
       navigation.popToTop();
     }
   }, [isAuthenticated]);
 
-  const goToSettings = () => {
-    if (Platform.OS === "ios") {
-      Linking.openURL("App-Prefs:PASSCODE");
-    } else if (Platform.OS === "android") {
-      Linking.sendIntent("android.settings.SECURITY_SETTINGS");
-    }
+  const callAuthenticateAction = () => {
+    promptForAuthentication(setAuthenticationResults);
   };
 
   return (
@@ -116,7 +83,7 @@ export const AuthScreen = ({ navigation, route }) => {
             style={styles.loginScreenButton}
             underlayColor="white"
             accessibilityLabel="Authenticate to Proceed"
-            onPress={promptForAuthentication}
+            onPress={callAuthenticateAction}
           >
             <Text style={styles.loginText}>Authenticate</Text>
           </TouchableOpacity>
