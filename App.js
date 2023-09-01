@@ -1,13 +1,15 @@
-/* eslint-disable react/style-prop-object */
-/* eslint-disable react/jsx-filename-extension */
-/* eslint-disable react/jsx-no-bind */
-/* eslint-disable react/react-in-jsx-scope */
-import { StatusBar } from 'expo-status-bar';
-import { useState, useEffect } from 'react';
-import * as LocalAuthentication from 'expo-local-authentication';
+import { NavigationContainer, useIsFocused } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState, useEffect } from 'react';
 import {
-  StyleSheet, Text, View, Button, TouchableOpacity,
+  StyleSheet, Text, View, TouchableOpacity, AppState, Linking, Platform,
 } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
+
+const Stack = createNativeStackNavigator();
+
+export const navigationRef = React.createRef();
 
 const styles = StyleSheet.create({
   container: {
@@ -39,50 +41,100 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function App() {
-  const [isBiometricSupported, setIsBioMetricSupported] = useState(false);
-  const [isAuthenticated, setIsAutheticated] = useState(false);
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authenticationError, setAuthenticationError] = useState('');
 
-  useEffect(() => {
-    // const checkForBiometric = async () => {
-    //   const compatible = await LocalAuthentication.hasHardwareAsync();
-    //   // console.log('compatible', compatible);
-    //   console.log(LocalAuthentication.SecurityLevel);
-    //   setIsBioMetricSupported(compatible);
-    // };
-    // checkForBiometric();
-    const auth = LocalAuthentication.authenticateAsync({
-      promptMessage: 'Authenticate with biometric',
-      fallbackLabel: 'Enter custom passcode',
-    });
-    auth.then((result) => {
+  const promptForAuthentication = async () => {
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Authenticate with biometric',
+        fallbackLabel: 'Enter custom passcode',
+      });
+
       console.log('result', result);
-      setIsAutheticated(result.success);
+      setIsAuthenticated(result.success);
       setAuthenticationError(result.error);
-    });
+    } catch (error) {
+      console.error('Error during authentication:', error);
+    }
+  };
+
+  const checkAuthentication = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    if (hasHardware) {
+      // Check if the app was in the background for more than 5 seconds
+      const backgroundTime = 10 * 1000; // 10 seconds
+      const currentTime = new Date().getTime();
+      const lastActiveTime = await SecureStore.getItemAsync('lastActiveTime');
+
+      if (!lastActiveTime || currentTime - parseInt(lastActiveTime, 10) > backgroundTime) {
+        promptForAuthentication();
+      }
+    }
+    // Update the last active time
+    await SecureStore.setItemAsync('lastActiveTime', new Date().getTime().toString());
+  };
+
+  useEffect(() => {
+    // Check authentication when the app is focused
+    const appStateChangeHandler = async (nextAppState) => {
+      if (nextAppState === 'active') {
+        checkAuthentication();
+      }
+    };
+
+    AppState.addEventListener('change', appStateChangeHandler);
+
+    // Check authentication on initial app load
+    checkAuthentication();
+
+    // Cleanup the event listener
+    return () => {
+      AppState.removeEventListener('change', appStateChangeHandler);
+    };
   }, []);
 
-  function authenticate() {
-    // const auth = LocalAuthentication.authenticateAsync({
-    //   promptMessage: 'Authenticate with biometric',
-    //   fallbackLabel: 'Enter custom passcode',
-    // });
-    // auth.then((result) => {
-    //   setIsAutheticated(result.success);
-    //   console.log(result);
-    // });
-  }
+  const AuthScreen = () => {
+    const isFocused = useIsFocused();
+
+    const goToSettings = () => {
+      if (Platform.OS === 'ios') {
+        Linking.openURL('App-Prefs:PASSCODE');
+      } else if (Platform.OS === 'android') {
+        Linking.sendIntent('android.settings.SECURITY_SETTINGS');
+      }
+    };
+
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        {((authenticationError === 'passcode_not_set' || authenticationError === 'not_enrolled') && isFocused) && (
+          <>
+            <Text style={{ textAlign: 'center' }}> To use the app you must set a screen lock</Text>
+            <TouchableOpacity style={styles.loginScreenButton} underlayColor="white" accessibilityLabel="Authenticate to Proceed" onPress={goToSettings}>
+              <Text style={styles.loginText}>Go to Settings (Set Pin/Passcode)</Text>
+            </TouchableOpacity>
+          </>
+        )}
+        {authenticationError === 'user_cancel' && (
+          <>
+              <Text style={{ textAlign: 'center' }}>Authenticate to proceed</Text>
+            <TouchableOpacity style={styles.loginScreenButton} underlayColor="white" accessibilityLabel="Authenticate to Proceed" onPress={promptForAuthentication}>
+              <Text style={styles.loginText}>Authenticate</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    );
+  };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      {!isAuthenticated
-      && (
-        <TouchableOpacity style={styles.loginScreenButton} underlayColor="white" accessibilityLabel="Authenticate to Proceed">
-          <Text style={styles.loginText}>Go to Settings</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+    <NavigationContainer ref={navigationRef}>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={AuthScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
+
+export default App;
