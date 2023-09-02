@@ -5,12 +5,13 @@ import {
   AppState,
   Text,
 } from "react-native";
-import { Styles as styles } from "./Styles";
+import { Styles } from "./Styles";
+import { commonStyles } from "../Styles";
 import {
   checkAuthentication,
   promptForAuthentication,
   goToSettings,
-} from "./utility/auth";
+} from "../utility/auth";
 export const AuthScreen = ({ navigation, route }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authenticationError, setAuthenticationError] = useState("");
@@ -55,20 +56,20 @@ export const AuthScreen = ({ navigation, route }) => {
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View style={Styles.parentView}>
       {(authenticationError === "passcode_not_set" ||
         authenticationError === "not_enrolled") && (
         <>
-          <Text style={styles.textCenterAlign}>
+          <Text style={Styles.textCenterAlign}>
             To use the app you must set a screen lock
           </Text>
           <TouchableOpacity
-            style={styles.loginScreenButton}
+            style={[Styles.loginScreenButton, commonStyles.ctaBtn]}
             underlayColor="white"
             accessibilityLabel="Set pin or passcode"
             onPress={goToSettings}
           >
-            <Text style={styles.loginText}>
+            <Text style={commonStyles.ctaText}>
               Go to Settings (Set Pin/Passcode)
             </Text>
           </TouchableOpacity>
@@ -76,25 +77,25 @@ export const AuthScreen = ({ navigation, route }) => {
       )}
       {authenticationError === "user_cancel" && (
         <>
-          <Text style={styles.textCenterAlign}>Authenticate to proceed</Text>
+          <Text style={Styles.textCenterAlign}>Authenticate to proceed</Text>
           <TouchableOpacity
-            style={styles.loginScreenButton}
+            style={[Styles.loginScreenButton, commonStyles.ctaBtn]}
             underlayColor="white"
             accessibilityLabel="Authenticate to Proceed"
             onPress={callAuthenticateAction}
           >
-            <Text style={styles.loginText}>Authenticate</Text>
+            <Text style={commonStyles.ctaText}>Authenticate</Text>
           </TouchableOpacity>
         </>
       )}
       {isAuthenticated && (
         <>
           <TouchableOpacity
-            style={styles.loginScreenButton}
+            style={[Styles.loginScreenButton, commonStyles.ctaBtn]}
             underlayColor="white"
             onPress={navigateToToDo}
           >
-            <Text style={styles.loginText}>Proceed</Text>
+            <Text style={commonStyles.ctaText}>Proceed</Text>
           </TouchableOpacity>
         </>
       )}
