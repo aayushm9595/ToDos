@@ -11,6 +11,7 @@ import Delete from "../Delete.svg";
 import Edit from "../Edit.svg";
 import { Styles } from "./Styles";
 import { commonStyles } from "../Styles";
+import { loadTasksFromStorage, saveTasksToStorage } from "../utility/storage";
 export const ToDoScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [taskText, setTaskText] = useState("");
@@ -18,29 +19,8 @@ export const ToDoScreen = () => {
 
   // Use `useEffect` to load tasks from SecureStore when the component mounts
   useEffect(() => {
-    loadTasksFromStorage();
+    loadTasksFromStorage(setTasks);
   }, []);
-
-  // Function to load tasks from SecureStore
-  const loadTasksFromStorage = async () => {
-    try {
-      const savedTasks = await SecureStore.getItemAsync("tasks");
-      if (savedTasks) {
-        setTasks(JSON.parse(savedTasks));
-      }
-    } catch (error) {
-      console.error("Error loading tasks:", error);
-    }
-  };
-
-  // Use secure store to save task to persist tasks in next sessions
-  const saveTasksToStorage = async (updatedTasks) => {
-    try {
-      await SecureStore.setItemAsync("tasks", JSON.stringify(updatedTasks));
-    } catch (error) {
-      console.error("Error saving tasks:", error);
-    }
-  };
 
   const btnStyle = useMemo(() => {
     return taskText === ""
