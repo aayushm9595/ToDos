@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  View,
-  TouchableOpacity,
-  AppState,
-  Text,
-} from "react-native";
+import { View, TouchableOpacity, AppState, Text } from "react-native";
 import { Styles } from "./Styles";
 import { commonStyles } from "../Styles";
 import {

@@ -5,17 +5,17 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-} from "react-native"; 
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
-import Delete from '../Delete.svg';
-import Edit from '../Edit.svg';
+import Delete from "../Delete.svg";
+import Edit from "../Edit.svg";
 import { Styles } from "./Styles";
 import { commonStyles } from "../Styles";
 export const ToDoScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [taskText, setTaskText] = useState("");
   const [editIndex, setEditIndex] = useState(null);
-  
+
   // Use `useEffect` to load tasks from SecureStore when the component mounts
   useEffect(() => {
     loadTasksFromStorage();
@@ -24,22 +24,21 @@ export const ToDoScreen = () => {
   // Function to load tasks from SecureStore
   const loadTasksFromStorage = async () => {
     try {
-      const savedTasks = await SecureStore.getItemAsync('tasks');
-      console.log('savedTasks', savedTasks);
+      const savedTasks = await SecureStore.getItemAsync("tasks");
       if (savedTasks) {
         setTasks(JSON.parse(savedTasks));
       }
     } catch (error) {
-      console.error('Error loading tasks:', error);
+      console.error("Error loading tasks:", error);
     }
   };
 
   // Use secure store to save task to persist tasks in next sessions
   const saveTasksToStorage = async (updatedTasks) => {
     try {
-      await SecureStore.setItemAsync('tasks', JSON.stringify(updatedTasks));
+      await SecureStore.setItemAsync("tasks", JSON.stringify(updatedTasks));
     } catch (error) {
-      console.error('Error saving tasks:', error);
+      console.error("Error saving tasks:", error);
     }
   };
 
@@ -82,26 +81,24 @@ export const ToDoScreen = () => {
     }
   };
 
-
   // Single To DO item in the list which can be edited, deleted
   const ToDoItem = React.memo(({ index, item }) => {
     return (
       <View style={Styles.taskItem}>
-        <Text ellipsizeMode="tail" numberOfLines={1} style={Styles.text}>{item}</Text>
+        <Text ellipsizeMode="tail" numberOfLines={1} style={Styles.text}>
+          {item}
+        </Text>
         <View style={Styles.row}>
-        <TouchableOpacity onPress={() => editTask(index)}>
-          <Edit width="30" height="30" marginRight={10}/>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => deleteTask(index)}>
-          <Delete width="30" height="30" />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => editTask(index)}>
+            <Edit width="30" height="30" marginRight={10} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => deleteTask(index)}>
+            <Delete width="30" height="30" />
+          </TouchableOpacity>
         </View>
       </View>
     );
   });
-
-  
-  
 
   return (
     <View style={Styles.container}>
