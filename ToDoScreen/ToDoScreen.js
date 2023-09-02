@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native"; 
+import * as SecureStore from "expo-secure-store";
 import Delete from '../Delete.svg';
 import Edit from '../Edit.svg';
 import { Styles } from "./Styles";
@@ -14,6 +15,54 @@ export const ToDoScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [taskText, setTaskText] = useState("");
   const [editIndex, setEditIndex] = useState(null);
+  
+  // Use `useEffect` to load tasks from SecureStore when the component mounts
+  useEffect(() => {
+    loadTasksFromStorage();
+  }, []);
+
+  // Function to load tasks from SecureStore
+  const loadTasksFromStorage = async () => {
+    try {
+      const savedTasks = await SecureStore.getItemAsync('tasks');
+      console.log('savedTasks', savedTasks);
+      if (savedTasks) {
+        setTasks(JSON.parse(savedTasks));
+      }
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+    }
+  };
+
+  const saveTasksToStorage = async (updatedTasks) => {
+    try {
+      await SecureStore.setItemAsync('tasks', JSON.stringify(updatedTasks));
+    } catch (error) {
+      console.error('Error saving tasks:', error);
+    }
+  };
+
+  const btnStyle = useMemo(() => {
+    return taskText === ""
+      ? [commonStyles.ctaBtn, Styles.paddingTen, Styles.bgOpacity]
+      : [commonStyles.ctaBtn, Styles.paddingTen];
+  }, [taskText]);
+
+  useEffect(() => {
+    saveTasksToStorage(tasks);
+  }, [tasks]);
+
+  const editTask = (index) => {
+    // Set the text input to the task text for editing
+    setTaskText(tasks[index]);
+    setEditIndex(index);
+  };
+
+  const deleteTask = (index) => {
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(index, 1);
+    setTasks(updatedTasks);
+  };
 
   const addTask = () => {
     if (taskText) {
@@ -31,7 +80,7 @@ export const ToDoScreen = () => {
     }
   };
 
-  const ToDoItem = ({ index, item }) => {
+  const ToDoItem = React.memo(({ index, item }) => {
     return (
       <View style={Styles.taskItem}>
         <Text ellipsizeMode="tail" numberOfLines={1} style={Styles.text}>{item}</Text>
@@ -45,20 +94,10 @@ export const ToDoScreen = () => {
         </View>
       </View>
     );
-  };
+  });
 
-  let btnStyle = taskText === "" ? [commonStyles.ctaBtn, Styles.paddingTen, Styles.bgOpacity] : [commonStyles.ctaBtn, Styles.paddingTen] 
-  const editTask = (index) => {
-    // Set the text input to the task text for editing
-    setTaskText(tasks[index]);
-    setEditIndex(index);
-  };
-
-  const deleteTask = (index) => {
-    const updatedTasks = [...tasks];
-    updatedTasks.splice(index, 1);
-    setTasks(updatedTasks);
-  };
+  
+  
 
   return (
     <View style={Styles.container}>
