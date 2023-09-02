@@ -34,6 +34,7 @@ export const ToDoScreen = () => {
     }
   };
 
+  // Use secure store to save task to persist tasks in next sessions
   const saveTasksToStorage = async (updatedTasks) => {
     try {
       await SecureStore.setItemAsync('tasks', JSON.stringify(updatedTasks));
@@ -59,12 +60,13 @@ export const ToDoScreen = () => {
   };
 
   const deleteTask = (index) => {
+    // Generate copy of new tasks from existing tasks and delete the task from copy to get new list of tasks
     const updatedTasks = [...tasks];
     updatedTasks.splice(index, 1);
     setTasks(updatedTasks);
   };
 
-  const addTask = () => {
+  const addOrUpdateTask = () => {
     if (taskText) {
       if (editIndex !== null) {
         // Edit existing task
@@ -80,6 +82,8 @@ export const ToDoScreen = () => {
     }
   };
 
+
+  // Single To DO item in the list which can be edited, deleted
   const ToDoItem = React.memo(({ index, item }) => {
     return (
       <View style={Styles.taskItem}>
@@ -112,7 +116,7 @@ export const ToDoScreen = () => {
       <TouchableOpacity
         style={btnStyle}
         disabled={taskText === ""}
-        onPress={addTask}
+        onPress={addOrUpdateTask}
       >
         <Text style={commonStyles.ctaText}>
           {editIndex !== null ? "Update" : "Add Task"}
