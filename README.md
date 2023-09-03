@@ -1,5 +1,5 @@
 # ToDos
-A simple/secure ToDos app based on bare react native app with expo local authentication support
+A simple/secure ToDos app based on bare react native app with expo local authentication support (to be run on actual physical android/ios device)
 
 Setup Instructions
 1. **npm i**
