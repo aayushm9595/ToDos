@@ -7,9 +7,17 @@ import {
   promptForAuthentication,
   goToSettings,
 } from "../utility/auth";
-export const AuthScreen = ({ navigation, isAuthenticatedToUse = false, authenticationErrorDefault = "" }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(isAuthenticatedToUse ?? false);
-  const [authenticationError, setAuthenticationError] = useState(authenticationErrorDefault ?? "");
+export const AuthScreen = ({
+  navigation,
+  isAuthenticatedToUse = false,
+  authenticationErrorDefault = "",
+}) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    isAuthenticatedToUse ?? false
+  );
+  const [authenticationError, setAuthenticationError] = useState(
+    authenticationErrorDefault ?? ""
+  );
 
   const navigateToToDo = () => {
     navigation.navigate("ToDo");
