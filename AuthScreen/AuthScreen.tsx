@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, AppState, Text } from "react-native";
 import { Styles } from "./Styles";
 import { commonStyles } from "../Styles";
@@ -7,7 +7,7 @@ import {
   promptForAuthentication,
   goToSettings,
 } from "../utility/auth";
-export const AuthScreen = ({ navigation, route }) => {
+export const AuthScreen = ({ navigation }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authenticationError, setAuthenticationError] = useState("");
 
@@ -35,16 +35,13 @@ export const AuthScreen = ({ navigation, route }) => {
     checkAuthentication(setAuthenticationResults);
 
     // Cleanup the event listener
-    return () => {
-      AppState.removeEventListener("change", appStateChangeHandler);
-    };
   }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigation.popToTop();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigation]);
 
   const callAuthenticateAction = () => {
     promptForAuthentication(setAuthenticationResults);
@@ -60,7 +57,6 @@ export const AuthScreen = ({ navigation, route }) => {
           </Text>
           <TouchableOpacity
             style={[Styles.loginScreenButton, commonStyles.ctaBtn]}
-            underlayColor="white"
             accessibilityLabel="Set pin or passcode"
             onPress={goToSettings}
           >
@@ -75,7 +71,6 @@ export const AuthScreen = ({ navigation, route }) => {
           <Text style={Styles.textCenterAlign}>Authenticate to proceed</Text>
           <TouchableOpacity
             style={[Styles.loginScreenButton, commonStyles.ctaBtn]}
-            underlayColor="white"
             accessibilityLabel="Authenticate to Proceed"
             onPress={callAuthenticateAction}
           >
@@ -87,7 +82,6 @@ export const AuthScreen = ({ navigation, route }) => {
         <>
           <TouchableOpacity
             style={[Styles.loginScreenButton, commonStyles.ctaBtn]}
-            underlayColor="white"
             onPress={navigateToToDo}
           >
             <Text style={commonStyles.ctaText}>Proceed</Text>

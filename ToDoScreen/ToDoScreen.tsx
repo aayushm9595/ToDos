@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
@@ -6,7 +7,6 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import Delete from "../Delete.svg";
 import Edit from "../Edit.svg";
 import { Styles } from "./Styles";
@@ -62,7 +62,7 @@ export const ToDoScreen = () => {
   };
 
   // Single To DO item in the list which can be edited, deleted
-  const ToDoItem = React.memo(({ index, item }) => {
+  const ToDoItem = React.memo(({ index, item }: { index: any; item: any }) => {
     return (
       <View style={Styles.taskItem}>
         <Text ellipsizeMode="tail" numberOfLines={1} style={Styles.text}>
