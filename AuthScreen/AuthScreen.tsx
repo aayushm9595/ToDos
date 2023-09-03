@@ -34,7 +34,7 @@ export const AuthScreen = ({ navigation }) => {
     // Check authentication on initial app load
     checkAuthentication(setAuthenticationResults);
 
-    // Cleanup the event listener
+    // Cleaning up the event listener is not required as we want to listen to this event all time
   }, []);
 
   useEffect(() => {
