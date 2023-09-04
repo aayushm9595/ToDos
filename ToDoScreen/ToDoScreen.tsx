@@ -69,10 +69,10 @@ export const ToDoScreen = () => {
           {item}
         </Text>
         <View style={Styles.row}>
-          <TouchableOpacity onPress={() => editTask(index)}>
+          <TouchableOpacity testID="Edit" onPress={() => editTask(index)}>
             <Edit width="30" height="30" marginRight={10} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => deleteTask(index)}>
+          <TouchableOpacity testID="Delete" onPress={() => deleteTask(index)}>
             <Delete width="30" height="30" />
           </TouchableOpacity>
         </View>
@@ -92,8 +92,10 @@ export const ToDoScreen = () => {
       />
       <TouchableOpacity
         style={btnStyle}
+        testID={editIndex !== null ? "update" : "add_task"}
         disabled={taskText === ""}
         onPress={addOrUpdateTask}
+        accessibilityLabel={editIndex !== null ? "Update" : "Add Task"}
       >
         <Text style={commonStyles.ctaText}>
           {editIndex !== null ? "Update" : "Add Task"}

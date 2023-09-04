@@ -13,10 +13,10 @@ export const AuthScreen = ({
   authenticationErrorDefault = "",
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(
-    isAuthenticatedToUse ?? false
+    isAuthenticatedToUse ?? false,
   );
   const [authenticationError, setAuthenticationError] = useState(
-    authenticationErrorDefault ?? ""
+    authenticationErrorDefault ?? "",
   );
 
   const navigateToToDo = () => {
