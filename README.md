@@ -27,5 +27,7 @@ Following test cases are added for ToDo Screen: <br/>
 - Add Task <br/>
 - Delete Task <br/>
 - Edit Task <br/>
+
+feel free to reachout to aayushm95@gmail.com in case of queries, (Screenshots are added in root dir of project)
 ![Alt text](https://github.com/aayushm9595/ToDos/blob/main/Unit-test.png)
 
