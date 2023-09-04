@@ -14,18 +14,18 @@ npx expo run:ios
 
 Running unit tests:
 
-1. After above setup run **npm run test** to run unit test
+1. After above setup run **npm run test** 
 You should get below output <br/>
 Following test cases are added for Auth Screen: <br/>
-If authenticated user should be allowed to proceed <br/>
-If not authenticated user should be prompted to authenticate <br/>
-If user has no screen lock , prompt user to set passcode/pin <br/><br/>
+- If authenticated user should be allowed to proceed <br/>
+- If not authenticated user should be prompted to authenticate <br/>
+- If user has no screen lock , prompt user to set passcode/pin <br/><br/>
 
 
 Following test cases are added for ToDo Screen: <br/>
-Renders Properly<br/>
-Add Task <br/>
-Delete Task <br/>
-Edit Task <br/>
+- Renders Properly<br/>
+- Add Task <br/>
+- Delete Task <br/>
+- Edit Task <br/>
 ![Alt text](https://github.com/aayushm9595/ToDos/blob/main/Unit-test.png)
 
