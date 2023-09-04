@@ -1,5 +1,10 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import {
+  render,
+  fireEvent,
+  act,
+  userEvent,
+} from "@testing-library/react-native";
 import { ToDoScreen } from "./ToDoScreen/ToDoScreen";
 
 // jest.mock(
@@ -14,61 +19,62 @@ describe("ToDoScreen", () => {
     expect(getByPlaceholderText("Enter a task")).toBeTruthy();
   });
 
-  // it("adds a new task", async () => {
-  //   const { getByText, getByPlaceholderText, getByTestId } = render(
-  //     <ToDoScreen />,
-  //   );
+  it("adds a new task", async () => {
+    const { getByText, getByPlaceholderText, getByTestId, getByA11yLabel } =
+      render(<ToDoScreen />);
 
-  //   const input = getByPlaceholderText("Enter a task");
-  //   const addButton = getByTestId("Add Task");
-  //   await waitFor(() => {
-  //     expect(addButton).toBeTruthy();
-  //   });
-  //   console.log("addButton.", addButton);
-  //   // Simulate changing the text input
-  //   await waitFor(() => {
-  //     fireEvent.changeText(input, "New Task");
-  //   });
-  //   console.log("addButton", addButton);
-  //   // // Simulate clicking the "Add Task" button
-  //   fireEvent.press(addButton);
-  //   // Use fireEvent with 'press' for React Native components
+    const input = getByPlaceholderText("Enter a task");
+    const addButton = getByTestId("add_task");
+    // Simulate changing the text input
+    act(() => {
+      fireEvent.changeText(input, "New Task");
+    });
+    // Checking if the value in text input is changed with updated value
+    expect(input.props.value).toBe("New Task");
+    const user = userEvent.setup();
+    // Simulate clicking the "Add Task" button
+    await user.press(addButton);
+    // Check if the new task is rendered
+    expect(getByText("New Task")).toBeTruthy();
+  });
 
-  //   // // Check if the new task is rendered
-  //   await waitFor(() => {
-  //     expect(getByText("New Task")).toBeTruthy();
-  //   });
-  // });
+  it("edits an existing task", async () => {
+    const { getByPlaceholderText, getAllByTestId, getByTestId, getByText } =
+      render(<ToDoScreen />);
 
-  //   it('edits an existing task', () => {
-  //     const { getByText, getAllByText, getByPlaceholderText } = render(<ToDoScreen />);
+    const input = getByPlaceholderText("Enter a task");
+    const addButton = getByTestId("add_task");
+    act(() => {
+      fireEvent.changeText(input, "New Task 1");
+    });
+    const user = userEvent.setup();
+    await user.press(addButton);
+    const editButtons = getAllByTestId("Edit");
+    await user.press(editButtons[0]);
 
-  //     const input = getByPlaceholderText('Enter a task');
-  //     const addButton = getByText('Add Task');
-  //     fireEvent.changeText(input, 'New Task 1');
-  //     fireEvent.press(addButton);
+    const updateButton = getByTestId("update");
+    act(() => {
+      fireEvent.changeText(input, "Updated Task");
+    });
+    await user.press(updateButton);
 
-  //     const editButton = getAllByText('Edit')[0];
-  //     fireEvent.press(editButton);
+    expect(getByText("Updated Task")).toBeTruthy();
+  });
 
-  //     const updateButton = getByText('Update');
-  //     fireEvent.changeText(input, 'Updated Task');
-  //     fireEvent.press(updateButton);
+  it("deletes a task", async () => {
+    const { queryByText, getByPlaceholderText, getByTestId, getAllByTestId } =
+      render(<ToDoScreen />);
+    const user = userEvent.setup();
+    const input = getByPlaceholderText("Enter a task");
+    const addButton = getByTestId("add_task");
+    act(() => {
+      fireEvent.changeText(input, "Task to Delete");
+    });
+    await user.press(addButton);
 
-  //     expect(getByText('Updated Task')).toBeTruthy();
-  //   });
+    const deleteButtons = getAllByTestId("Delete");
+    await user.press(deleteButtons[0]);
 
-  //   it('deletes a task', () => {
-  //     const { getByText, queryByText, getByPlaceholderText } = render(<ToDoScreen />);
-
-  //     const input = getByPlaceholderText('Enter a task');
-  //     const addButton = getByText('Add Task');
-  //     fireEvent.changeText(input, 'Task to Delete');
-  //     fireEvent.press(addButton);
-
-  //     const deleteButton = getByText('Delete');
-  //     fireEvent.press(deleteButton);
-
-  //     expect(queryByText('Task to Delete')).toBeNull();
-  //   });
+    expect(queryByText("Task to Delete")).toBeNull();
+  });
 });
