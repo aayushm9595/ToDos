@@ -47,7 +47,7 @@ export const AuthScreen = ({
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigation.popToTop();
+      navigation.navigate("Auth");
     }
   }, [isAuthenticated, navigation]);
 
@@ -92,7 +92,7 @@ export const AuthScreen = ({
             style={[Styles.loginScreenButton, commonStyles.ctaBtn]}
             onPress={navigateToToDo}
           >
-            <Text style={commonStyles.ctaText}>Proceed to add items</Text>
+            <Text style={commonStyles.ctaText}>Proceed to add notes</Text>
           </TouchableOpacity>
         </>
       )}

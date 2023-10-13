@@ -51,9 +51,7 @@ describe("AuthScreen", () => {
     );
 
     // Write assertions to check if the component renders as expected
-    expect(
-      getByText("Proceed to add items"),
-    ).toBeDefined();
+    expect(getByText("Proceed to add notes")).toBeDefined();
     // Add more assertions as needed
   });
 

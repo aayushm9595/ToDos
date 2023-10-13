@@ -1,21 +1,13 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useMemo, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import Delete from "../Delete.svg";
 import Edit from "../Edit.svg";
 import { Styles } from "./Styles";
 import { commonStyles } from "../Styles";
 import { loadTasksFromStorage, saveTasksToStorage } from "../utility/storage";
-export const ToDoScreen = () => {
-  const [tasks, setTasks] = useState([]);
-  const [taskText, setTaskText] = useState("");
-  const [editIndex, setEditIndex] = useState(null);
+export const ToDoScreen = ({ navigation, propTasks }) => {
+  const [tasks, setTasks] = useState(propTasks);
 
   // Use `useEffect` to load tasks from SecureStore when the component mounts
   useEffect(() => {
@@ -23,19 +15,29 @@ export const ToDoScreen = () => {
   }, []);
 
   const btnStyle = useMemo(() => {
-    return taskText === ""
-      ? [commonStyles.ctaBtn, Styles.paddingTen, Styles.bgOpacity]
-      : [commonStyles.ctaBtn, Styles.paddingTen];
-  }, [taskText]);
+    return [commonStyles.ctaBtn, Styles.paddingTen];
+  }, []);
 
   useEffect(() => {
     saveTasksToStorage(tasks);
   }, [tasks]);
 
+  const saveTasksToStore = (text, indexToUpdate) => {
+    var updatedTasks = tasks ? [...tasks] : [];
+    if (typeof indexToUpdate === "number") {
+      updatedTasks[indexToUpdate] = text;
+    } else {
+      updatedTasks.push(text);
+    }
+    setTasks(updatedTasks);
+  };
   const editTask = (index) => {
     // Set the text input to the task text for editing
-    setTaskText(tasks[index]);
-    setEditIndex(index);
+    navigation.navigate("Note", {
+      editIndex: index,
+      existingText: tasks[index],
+      saveTasks: saveTasksToStore,
+    });
   };
 
   const deleteTask = (index) => {
@@ -46,23 +48,13 @@ export const ToDoScreen = () => {
   };
 
   const addOrUpdateTask = () => {
-    if (taskText) {
-      if (editIndex !== null) {
-        // Edit existing task
-        const updatedTasks = [...tasks];
-        updatedTasks[editIndex] = taskText;
-        setTasks(updatedTasks);
-        setEditIndex(null);
-      } else {
-        // Add new task
-        setTasks([...tasks, taskText]);
-      }
-      setTaskText("");
-    }
+    navigation.navigate("Note", {
+      saveTasks: saveTasksToStore,
+    });
   };
 
   // Single To DO item in the list which can be edited, deleted
-  const ToDoItem = React.memo(({ index, item }: { index: any; item: any }) => {
+  const NoteItem = React.memo(({ index, item }: { index: any; item: any }) => {
     return (
       <View style={Styles.taskItem}>
         <Text ellipsizeMode="tail" numberOfLines={1} style={Styles.text}>
@@ -72,7 +64,10 @@ export const ToDoScreen = () => {
           <TouchableOpacity testID="Edit" onPress={() => editTask(index)}>
             <Edit width="30" height="30" marginRight={10} />
           </TouchableOpacity>
-          <TouchableOpacity testID="Delete" onPress={() => deleteTask(index)}>
+          <TouchableOpacity
+            testID={`Delete_${index}`}
+            onPress={() => deleteTask(index)}
+          >
             <Delete width="30" height="30" />
           </TouchableOpacity>
         </View>
@@ -82,29 +77,19 @@ export const ToDoScreen = () => {
 
   return (
     <View style={Styles.container}>
-      <Text style={Styles.header}>To-Do List</Text>
-      <TextInput
-        style={Styles.input}
-        placeholder="Enter a task"
-        placeholderTextColor={"black"}
-        value={taskText}
-        onChangeText={(text) => setTaskText(text)}
-      />
+      <Text style={Styles.header}>Notes</Text>
       <TouchableOpacity
         style={btnStyle}
-        testID={editIndex !== null ? "update" : "add_task"}
-        disabled={taskText === ""}
+        testID={"add_task"}
         onPress={addOrUpdateTask}
-        accessibilityLabel={editIndex !== null ? "Update" : "Add Task"}
+        accessibilityLabel={"Add new note"}
       >
-        <Text style={commonStyles.ctaText}>
-          {editIndex !== null ? "Update" : "Add Task"}
-        </Text>
+        <Text style={commonStyles.ctaText}>{"Add new note"}</Text>
       </TouchableOpacity>
       <FlatList
         style={commonStyles.mt10}
         data={tasks}
-        renderItem={({ item, index }) => <ToDoItem item={item} index={index} />}
+        renderItem={({ item, index }) => <NoteItem item={item} index={index} />}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>

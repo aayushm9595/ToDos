@@ -11,6 +11,7 @@ export const loadTasksFromStorage = async (setTasks) => {
     console.error("Error loading tasks:", error);
   }
 };
+
 // Use secure store to save task to persist tasks in next sessions
 export const saveTasksToStorage = async (updatedTasks) => {
   try {
